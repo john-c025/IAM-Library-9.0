@@ -1,0 +1,19 @@
+{
+  "ApiConfiguration": {
+    "AuthHeader": "QmVhcmVy",
+    "AccountDetailsParams": "",
+    "AuthBaseUrl": "aHR0cHM6Ly9iZXRhYXBpdjIuaWFtLXdvcmxkd2lkZWNvcnAuY29t",
+    "EndpointParameterAndSeparator": "Jg==",
+    "AuthSuccessDashEndpoint": "L2FjYy92MS9HZXRBY2NvdW50RGV0YWlscz9BY2NvdW50S2V5PQ==",
+    "AuthSigGenEndpoint": "L2F1dGgvdjE=",
+    "ReportsCoverageEndpoint": "L2NvbW0vdjEvTG9hZENvbW1pc3Npb25Db3ZlcmFnZQ==",
+    "ReportsCSummaryEndpointBase": "L2NvbW0vdjEvTG9hZEJpbmFyeUNvbW1pc3Npb25TdW1tYXJ5",
+    "ReportsCSummaryOptionParam": "b3B0aW9uPQ==",
+    "ReportsCSummaryAccKey": "YWNjb3VudGtleT0=",
+    "ReportsCSummaryEndpointDfromParam": "ZGZyb209",
+    "ReportsCSummaryEndpointDtoParam": "ZHRvPQ==",
+    "ReportsCHistoryEndpointBase": "L2NvbW0vdjEvTG9hZEJpbmFyeUNvbW1pc3Npb24=",
+    "ReportsCReferralEndpointBase": "L2NvbW0vdjEvR2V0UmVmZXJyYWxDb21taXNzaW9u",
+    "InvalidIndicator": "aW52YWxpZF91c2Vy"
+  }
+}

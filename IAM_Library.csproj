@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<!--testing this for identity error-->
+	<_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.10" />
+	<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.10" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+	<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.14.0" />
+	<PackageReference Include="Microsoft.IdentityModel.Logging" Version="8.14.0" />
+	<PackageReference Include="Microsoft.IdentityModel.Protocols" Version="8.14.0" />
+	<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.14.0" />
+	<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
+	<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+  </ItemGroup>
+	
+	<ItemGroup>
+		<Reference Include="IAM_Library">
+			<HintPath>..\Library-Integration\IAM-MOBILE-DEV-JOHN\Libraries\IAM_Library.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="appWallet\main\profile\" />
+		<Folder Include="appWallet\main\transaction\" />
+	</ItemGroup>
+
+</Project>
