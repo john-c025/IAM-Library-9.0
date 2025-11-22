@@ -1097,17 +1097,17 @@ namespace IAM_Library.appWallet.account
 
             try
             {
-                var baseUrl = Encryption.decodeString(_wallet_endpoints.live);
+                var baseUrl = Encryption.decodeString(_wallet_endpoints.baseUrlWallet);
                 var endpointNew = Encryption.decodeString(_wallet_endpoints.COProcessingFeeNew);
 
-                var endpoint = Encryption.decodeString(_wallet_endpoints.COProcessingFee); // baseUrl+endpointNew
+                var endpoint = baseUrl + endpointNew;
                 var apiUrl = endpoint;
                 Console.WriteLine($" API Endpoint for cashout fee is {apiUrl}");
                 // here's the problem
                 var response = await _httpClient.GetAsync(apiUrl);
 
 
-                Console.WriteLine($"Response from API Client after Generation : Code is {response.StatusCode} . . .  & API Signature is {response}");
+                Console.WriteLine($"Response from API Client after Generation of otp: Code is {response.StatusCode} . . .  & API Signature is {response}");
 
 
                 if (response.IsSuccessStatusCode)

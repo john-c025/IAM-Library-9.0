@@ -106,9 +106,10 @@ namespace IAM_Library.appWallet.api
         public static string loadCashParam = IAM_Maintenance.Decrypt("fsuMKYcWYYDsBMYP3TKLtAEjJbdMh5I1jPjam521F88=", _key, _iv);
         public static string logoutAPI = IAM_Maintenance.Decrypt("CZ+ow8okUFtdDoc3GZhGbxh4rUNL8xWt+lIfxeqj8iLODHhOLPhbpCxcGL5LsFXk73wZgxsXLgC8RaeP/VD3eA==",_key,_iv);
 
-        public static string COProcessingFee = IAM_Maintenance.Decrypt("CZ+ow8okUFtdDoc3GZhGbxh4rUNL8xWt+lIfxeqj8iJ1lYhgmWfbpFNUYWGFu+TFYu42mC1gv6R5I3wNsWowlUBQpG1IO9/8lp4+/bhUPigGFK30mHaIZOWKW6oNGzEQ", _key, _iv);
-		public static string CIProcessingFee = IAM_Maintenance.Decrypt("CZ+ow8okUFtdDoc3GZhGbxh4rUNL8xWt+lIfxeqj8iJ1lYhgmWfbpFNUYWGFu+TFtO6e7nw18Ex+oYeKjp3SibW7ANANMxB318BvB3IHjL9NW2Bvls8isowOnogh9JDA", _key, _iv);
-        
+        public static string COProcessingFee = "aHR0cHM6Ly9hcGkuaWFtLXdhbGxldC5jb20vdjEvQ2FzaG91dC9HZXRDYXNob3V0UHJvY2Vzc2luZ0ZlZQ==";
+
+        public static string CIProcessingFee = "aHR0cHM6Ly9hcGkuaWFtLXdhbGxldC5jb20vdjEvQ2FzaGluL0dldENhc2hpblByb2Nlc3NpbmdGZWU=";
+
         /*
          *  /v1/Account/UpdateCredential
          *  
