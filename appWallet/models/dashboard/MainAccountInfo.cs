@@ -542,6 +542,45 @@ namespace IAM_Library.appWallet.models.dashboard
         public double max_CashIn { get; set; }
         public double max_CashOut { get; set; }
     }
+
+    /// <summary>Wrapper for GET GetAccountKYCHistory success body (status, total, history).</summary>
+    public class GetAccountKYCHistoryApiResponse
+    {
+        public string status { get; set; }
+        public int total { get; set; }
+        public List<WalletAccountKYCHistoryItem> history { get; set; }
+    }
+
+    /// <summary>One KYC submission row with optional status logs (matches utilities API shape).</summary>
+    public class WalletAccountKYCHistoryItem
+    {
+        public DateTime dateUploaded { get; set; }
+        public int level { get; set; }
+        public int idCode { get; set; }
+        public string idDesc { get; set; }
+        public string accountID { get; set; }
+        public string cardNumber { get; set; }
+        public string cardFname { get; set; }
+        public string cardMname { get; set; }
+        public string cardSname { get; set; }
+        public int fileTypeID { get; set; }
+        public string filePath { get; set; }
+        public int status { get; set; }
+        public List<WalletKYCHistoryLog> logs { get; set; }
+    }
+
+    public class WalletKYCHistoryLog
+    {
+        public DateTime updateDate { get; set; }
+        public string tranNo { get; set; }
+        public string accountID { get; set; }
+        public int idCode { get; set; }
+        public string cardNumber { get; set; }
+        public int status { get; set; }
+        public string remarks { get; set; }
+        public string verifiedBy { get; set; }
+    }
+
     public class BillsPaymentConfigModel
     {
         public string description { get; set; }

@@ -1,4 +1,4 @@
-﻿using IAM_Library.models.auth;
+using IAM_Library.models.auth;
 using IAM_Library._custom;
 using IAM_Library.api;
 using IAM_Library.models.dashboard;
@@ -18,6 +18,7 @@ using IAM_Library.models.general;
 using IAM_Library.models.wallet;
 using IAM_Library.appWallet.models;
 using IAM_Library.models.registration;
+using System.IO;
 
 namespace IAM_Library.appWallet.account
 {
@@ -273,7 +274,7 @@ namespace IAM_Library.appWallet.account
                         {
                             IsSuccess = true,
                             StatusCode = 200,
-                            Description = "Cashout Successful!",
+                            Description = deserializedResponse?.message ?? "Cashout Successful!",
                             Data = deserializedResponse
                         };
                     }
@@ -284,12 +285,31 @@ namespace IAM_Library.appWallet.account
 
                         try
                         {
-                            var errorJson = JsonConvert.DeserializeObject<ErrorModel>(errorContent);
-                            errorMessage = errorJson?.Message ?? $"An error occurred. {errorJson.Message} ";
+                            // Try to deserialize as MainCashoutResponseModel first to get the message
+                            var cashoutErrorResponse = JsonConvert.DeserializeObject<MainCashoutResponseModel>(errorContent);
+                            if (cashoutErrorResponse != null && !string.IsNullOrEmpty(cashoutErrorResponse.message))
+                            {
+                                errorMessage = cashoutErrorResponse.message;
+                            }
+                            else
+                            {
+                                // Fall back to ErrorModel
+                                var errorJson = JsonConvert.DeserializeObject<ErrorModel>(errorContent);
+                                errorMessage = errorJson?.Message ?? $"An error occurred.";
+                            }
                         }
                         catch (JsonException)
                         {
-                            errorMessage = errorContent;
+                            // If deserialization fails, try ErrorModel
+                            try
+                            {
+                                var errorJson = JsonConvert.DeserializeObject<ErrorModel>(errorContent);
+                                errorMessage = errorJson?.Message ?? errorContent;
+                            }
+                            catch
+                            {
+                                errorMessage = errorContent;
+                            }
                             Console.WriteLine($"Exception Error on Parsing Error Content - {errorMessage}");
                         }
 
@@ -300,7 +320,7 @@ namespace IAM_Library.appWallet.account
                         {
                             IsSuccess = false,
                             StatusCode = (int)responseClient.StatusCode,
-                            Description = $"{errorMessage}",
+                            Description = errorMessage,
                             Data = null
                         };
 
@@ -1885,7 +1905,68 @@ namespace IAM_Library.appWallet.account
             }
         }
 
+        /// <summary>
+        /// GET /v1/KYC/GetAccountKYCHistory?accountid= — ApiKey header (same as other KYC util calls).
+        /// </summary>
+        public async Task<ApiResponseModel<List<WalletAccountKYCHistoryItem>>> LoadAccountKYCHistory(string accountId)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(accountId))
+                {
+                    return new ApiResponseModel<List<WalletAccountKYCHistoryItem>>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        Description = "accountId is required.",
+                        Data = null
+                    };
+                }
 
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("ApiKey", "f24b51dfd6fda3a6fb20882c1554790e");
+
+                var baseUrl = Encryption.decodeString(_wallet_endpoints.baseUrlWalletKYC);
+                var path = _wallet_endpoints.GetAccountKYCHistory;
+                string api_url = $"{baseUrl}{path}?accountid={Uri.EscapeDataString(accountId)}";
+
+                Console.WriteLine($"[DEBUG] Fetching KYC Account History: {api_url}");
+                var response = await _httpClient.GetAsync(api_url);
+                var content = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var wrapper = JsonConvert.DeserializeObject<GetAccountKYCHistoryApiResponse>(content);
+                    var list = wrapper?.history ?? new List<WalletAccountKYCHistoryItem>();
+                    return new ApiResponseModel<List<WalletAccountKYCHistoryItem>>
+                    {
+                        IsSuccess = true,
+                        StatusCode = 200,
+                        Description = "KYC history fetched successfully.",
+                        Data = list
+                    };
+                }
+
+                return new ApiResponseModel<List<WalletAccountKYCHistoryItem>>
+                {
+                    IsSuccess = false,
+                    StatusCode = (int)response.StatusCode,
+                    Description = content,
+                    Data = null
+                };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"[ERROR] Exception in LoadAccountKYCHistory: {e.Message}");
+                return new ApiResponseModel<List<WalletAccountKYCHistoryItem>>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Description = $"Error: {e.Message}",
+                    Data = null
+                };
+            }
+        }
 
         //Bills Payment
 
@@ -2873,6 +2954,226 @@ namespace IAM_Library.appWallet.account
             }
         }
 
+
+        /// <summary>
+        /// GET /v1/Announcements/GetActiveAnnouncements (optional query: announcementType, urgencyType).
+        /// Uses ApiKey header (no Bearer).
+        /// </summary>
+        public async Task<ApiResponseModel<List<WalletAnnouncementItem>>> GetActiveAnnouncements(
+            int? announcementType = null,
+            int? urgencyType = null)
+        {
+            var startTime = DateTime.Now;
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add("ApiKey", "f24b51dfd6fda3a6fb20882c1554790e");
+
+            var endpoint = _wallet_endpoints.GetActiveAnnouncements;
+            var queryParts = new List<string>();
+            if (announcementType.HasValue)
+                queryParts.Add($"announcementType={announcementType.Value}");
+            if (urgencyType.HasValue)
+                queryParts.Add($"urgencyType={urgencyType.Value}");
+            var qs = queryParts.Count > 0 ? "?" + string.Join("&", queryParts) : "";
+            var apiUrl = _apiBaseUrl + endpoint + qs;
+
+            try
+            {
+                Console.WriteLine($"[DEBUG] ===== GetActiveAnnouncements START =====");
+                Console.WriteLine($"[DEBUG] URL: {apiUrl}");
+                Console.WriteLine($"[DEBUG] Params: announcementType={(announcementType.HasValue ? announcementType.Value.ToString() : "null")}, urgencyType={(urgencyType.HasValue ? urgencyType.Value.ToString() : "null")}");
+
+                var response = await _httpClient.GetAsync(apiUrl);
+                var content = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine($"[DEBUG] HTTP {(int)response.StatusCode} ({response.StatusCode}) for GetActiveAnnouncements");
+                Console.WriteLine($"[DEBUG] ContentLength={(content?.Length ?? 0)} Preview={(string.IsNullOrEmpty(content) ? "<empty>" : content.Substring(0, Math.Min(500, content.Length)))}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var list = JsonConvert.DeserializeObject<List<WalletAnnouncementItem>>(content);
+                    var totalDuration = DateTime.Now - startTime;
+                    Console.WriteLine($"[DEBUG] ===== GetActiveAnnouncements SUCCESS - Total Duration: {totalDuration.TotalMilliseconds}ms =====");
+                    return new ApiResponseModel<List<WalletAnnouncementItem>>
+                    {
+                        IsSuccess = true,
+                        StatusCode = 200,
+                        Description = "Announcements fetched.",
+                        Data = list
+                    };
+                }
+
+                {
+                    var totalDuration = DateTime.Now - startTime;
+                    Console.WriteLine($"[DEBUG] ===== GetActiveAnnouncements FAIL - Total Duration: {totalDuration.TotalMilliseconds}ms =====");
+                }
+                return new ApiResponseModel<List<WalletAnnouncementItem>>
+                {
+                    IsSuccess = false,
+                    StatusCode = (int)response.StatusCode,
+                    Description = content,
+                    Data = null
+                };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"[DEBUG] ===== GetActiveAnnouncements EXCEPTION =====");
+                Console.WriteLine($"[DEBUG] ExceptionType={e.GetType().Name} Message={e.Message}");
+                Console.WriteLine($"[DEBUG] InnerException={e.InnerException?.Message ?? "None"}");
+                var totalDuration = DateTime.Now - startTime;
+                Console.WriteLine($"[DEBUG] ===== GetActiveAnnouncements EXCEPTION - Total Duration: {totalDuration.TotalMilliseconds}ms =====");
+                return new ApiResponseModel<List<WalletAnnouncementItem>>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Description = $"Cannot fetch announcements: {e.Message}",
+                    Data = null
+                };
+            }
+        }
+
+        /// <summary>
+        /// GET /v1/Announcements/GetAllAnnouncements (optional query: announcementType, status).
+        /// Uses ApiKey header (no Bearer).
+        /// </summary>
+        public async Task<ApiResponseModel<List<WalletAnnouncementItem>>> GetAllAnnouncements(
+            int? announcementType = null,
+            bool? status = null)
+        {
+            var startTime = DateTime.Now;
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add("ApiKey", "f24b51dfd6fda3a6fb20882c1554790e");
+
+            var endpoint = _wallet_endpoints.GetAllAnnouncements;
+            var queryParts = new List<string>();
+            if (announcementType.HasValue)
+                queryParts.Add($"announcementType={announcementType.Value}");
+            if (status.HasValue)
+                queryParts.Add($"status={status.Value.ToString().ToLowerInvariant()}");
+            var qs = queryParts.Count > 0 ? "?" + string.Join("&", queryParts) : "";
+            var apiUrl = _apiBaseUrl + endpoint + qs;
+
+            try
+            {
+                Console.WriteLine($"[DEBUG] ===== GetAllAnnouncements START =====");
+                Console.WriteLine($"[DEBUG] URL: {apiUrl}");
+                Console.WriteLine($"[DEBUG] Params: announcementType={(announcementType.HasValue ? announcementType.Value.ToString() : "null")}, status={(status.HasValue ? status.Value.ToString() : "null")}");
+
+                var response = await _httpClient.GetAsync(apiUrl);
+                var content = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine($"[DEBUG] HTTP {(int)response.StatusCode} ({response.StatusCode}) for GetAllAnnouncements");
+                Console.WriteLine($"[DEBUG] ContentLength={(content?.Length ?? 0)} Preview={(string.IsNullOrEmpty(content) ? "<empty>" : content.Substring(0, Math.Min(500, content.Length)))}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var list = JsonConvert.DeserializeObject<List<WalletAnnouncementItem>>(content);
+                    var totalDuration = DateTime.Now - startTime;
+                    Console.WriteLine($"[DEBUG] ===== GetAllAnnouncements SUCCESS - Total Duration: {totalDuration.TotalMilliseconds}ms =====");
+                    return new ApiResponseModel<List<WalletAnnouncementItem>>
+                    {
+                        IsSuccess = true,
+                        StatusCode = 200,
+                        Description = "Announcements fetched.",
+                        Data = list
+                    };
+                }
+
+                {
+                    var totalDuration = DateTime.Now - startTime;
+                    Console.WriteLine($"[DEBUG] ===== GetAllAnnouncements FAIL - Total Duration: {totalDuration.TotalMilliseconds}ms =====");
+                }
+                return new ApiResponseModel<List<WalletAnnouncementItem>>
+                {
+                    IsSuccess = false,
+                    StatusCode = (int)response.StatusCode,
+                    Description = content,
+                    Data = null
+                };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"[DEBUG] ===== GetAllAnnouncements EXCEPTION =====");
+                Console.WriteLine($"[DEBUG] ExceptionType={e.GetType().Name} Message={e.Message}");
+                Console.WriteLine($"[DEBUG] InnerException={e.InnerException?.Message ?? "None"}");
+                var totalDuration = DateTime.Now - startTime;
+                Console.WriteLine($"[DEBUG] ===== GetAllAnnouncements EXCEPTION - Total Duration: {totalDuration.TotalMilliseconds}ms =====");
+                return new ApiResponseModel<List<WalletAnnouncementItem>>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Description = $"Cannot fetch announcements: {e.Message}",
+                    Data = null
+                };
+            }
+        }
+
+        /// <summary>
+        /// GET /v1/Announcements/GetAnnouncementById/{announcementId}.
+        /// Uses ApiKey header (no Bearer).
+        /// </summary>
+        public async Task<ApiResponseModel<WalletAnnouncementItem>> GetAnnouncementById(int announcementId)
+        {
+            var startTime = DateTime.Now;
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add("ApiKey", "f24b51dfd6fda3a6fb20882c1554790e");
+
+            var endpoint = _wallet_endpoints.GetAnnouncementById;
+            var apiUrl = _apiBaseUrl + endpoint + announcementId;
+
+            try
+            {
+                Console.WriteLine($"[DEBUG] ===== GetAnnouncementById START =====");
+                Console.WriteLine($"[DEBUG] URL: {apiUrl}");
+                Console.WriteLine($"[DEBUG] Params: announcementId={announcementId}");
+
+                var response = await _httpClient.GetAsync(apiUrl);
+                var content = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine($"[DEBUG] HTTP {(int)response.StatusCode} ({response.StatusCode}) for GetAnnouncementById");
+                Console.WriteLine($"[DEBUG] ContentLength={(content?.Length ?? 0)} Preview={(string.IsNullOrEmpty(content) ? "<empty>" : content.Substring(0, Math.Min(500, content.Length)))}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var item = JsonConvert.DeserializeObject<WalletAnnouncementItem>(content);
+                    var totalDuration = DateTime.Now - startTime;
+                    Console.WriteLine($"[DEBUG] ===== GetAnnouncementById SUCCESS - Total Duration: {totalDuration.TotalMilliseconds}ms =====");
+                    return new ApiResponseModel<WalletAnnouncementItem>
+                    {
+                        IsSuccess = true,
+                        StatusCode = 200,
+                        Description = "Announcement fetched.",
+                        Data = item
+                    };
+                }
+
+                {
+                    var totalDuration = DateTime.Now - startTime;
+                    Console.WriteLine($"[DEBUG] ===== GetAnnouncementById FAIL - Total Duration: {totalDuration.TotalMilliseconds}ms =====");
+                }
+                return new ApiResponseModel<WalletAnnouncementItem>
+                {
+                    IsSuccess = false,
+                    StatusCode = (int)response.StatusCode,
+                    Description = content,
+                    Data = null
+                };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"[DEBUG] ===== GetAnnouncementById EXCEPTION =====");
+                Console.WriteLine($"[DEBUG] ExceptionType={e.GetType().Name} Message={e.Message}");
+                Console.WriteLine($"[DEBUG] InnerException={e.InnerException?.Message ?? "None"}");
+                var totalDuration = DateTime.Now - startTime;
+                Console.WriteLine($"[DEBUG] ===== GetAnnouncementById EXCEPTION - Total Duration: {totalDuration.TotalMilliseconds}ms =====");
+                return new ApiResponseModel<WalletAnnouncementItem>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Description = $"Cannot fetch announcement: {e.Message}",
+                    Data = null
+                };
+            }
+        }
 
         // GET Module Status list
         public async Task<ApiResponseModel<ModuleStatus>> LoadModuleStatusList(int sysId)

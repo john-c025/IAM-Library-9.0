@@ -52,7 +52,7 @@ namespace IAM_Library.appWallet.api
         public static string walletGetAccountDetails = IAM_Maintenance.Decrypt("MVm0p9volf1zxQIVroW2SSaB17j/t0xR93P5NANppBNk81U9U7B06KCYa044teLO", _key, _iv);
         public static string walletGetAccountDetailsFull = IAM_Maintenance.Decrypt("MVm0p9volf1zxQIVroW2SSaB17j/t0xR93P5NANppBOqj+bU4wetsH62p4atb4Hvl2jMSWujHavn7bIJFQn9GQ==", _key, _iv);
         public static string api_key = "NjNkNDYwMGY2YmM4YjM0MTQwZmNhMGJkM2E4M2I1Nzg=";
-
+        //f24b51dfd6fda3a6fb20882c1554790e
         
         // WALLETS
 
@@ -150,6 +150,9 @@ namespace IAM_Library.appWallet.api
         public static string LoadKYCDetailsAccountIDParam = "YWNjb3VudGlkPQ==";
         public static string LoadMainKYCLevel = "L3YxL0tZQy9HZXRBY2NvdW50S1lDTGV2ZWw/b3B0aW9uPTEmYWNjb3VudGlkPQ==";
 
+        /// <summary>GET /v1/KYC/GetAccountKYCHistory?accountid= — plain path (apiutil host via baseUrlWalletKYC).</summary>
+        public static string GetAccountKYCHistory = "/v1/KYC/GetAccountKYCHistory";
+
         // BillsPayment
 
         
@@ -209,7 +212,12 @@ namespace IAM_Library.appWallet.api
 
         public static string GetModuleStatus = "L3YxL1N5c3RlbS9HZXRTeXN0ZW1GdW5jdGlvblN0YXR1cw==";
 
-
+        // ANNOUNCEMENTS (GET only for user-facing apps)
+        // NOTE: No base64/encryption required per integration request.
+        public static string GetActiveAnnouncements = "/v1/Announcements/GetActiveAnnouncements";
+        public static string GetAllAnnouncements = "/v1/Announcements/GetAllAnnouncements";
+        public static string GetAnnouncementById = "/v1/Announcements/GetAnnouncementById/";
+     
         /* < November 11 2024 >
          *  - endpoints fix remaining ep
          *  - getCashoutBankList

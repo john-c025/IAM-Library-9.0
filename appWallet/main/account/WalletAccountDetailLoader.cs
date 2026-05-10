@@ -1,4 +1,4 @@
-﻿using IAM_Library._custom;
+using IAM_Library._custom;
 using IAM_Library.api;
 using IAM_Library.models.auth;
 using IAM_Library.models.dashboard;
@@ -547,6 +547,31 @@ namespace IAM_Library.appWallet.account
             }
         }
 
+        public async Task<ApiResponseModel<List<WalletAccountKYCHistoryItem>>> LoadAccountKYCHistoryLoader(
+            WalletAuthResponseData credentials,
+            HttpClient httpClient,
+            string accountId)
+        {
+            try
+            {
+                var accountAPIClient = new WalletAccountsApiClient(
+                    Encryption.decodeString(_wallet_endpoints.baseUrlWallet),
+                    credentials,
+                    httpClient);
+                return await accountAPIClient.LoadAccountKYCHistory(accountId);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponseModel<List<WalletAccountKYCHistoryItem>>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
         // Bills paymentssss
 
 
@@ -847,6 +872,83 @@ namespace IAM_Library.appWallet.account
             catch (Exception ex)
             {
                 return new ApiResponseModel<ModuleStatus>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<ApiResponseModel<List<WalletAnnouncementItem>>> LoadActiveAnnouncementsLoader(
+            WalletAuthResponseData credentials,
+            HttpClient httpClient,
+            int? announcementType = null,
+            int? urgencyType = null)
+        {
+            try
+            {
+                var apiClient = new WalletAccountsApiClient(
+                    Encryption.decodeString(_wallet_endpoints.baseUrlWalletKYC),
+                    credentials,
+                    httpClient);
+                return await apiClient.GetActiveAnnouncements(announcementType, urgencyType);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponseModel<List<WalletAnnouncementItem>>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<ApiResponseModel<List<WalletAnnouncementItem>>> LoadAllAnnouncementsLoader(
+            WalletAuthResponseData credentials,
+            HttpClient httpClient,
+            int? announcementType = null,
+            bool? status = null)
+        {
+            try
+            {
+                var apiClient = new WalletAccountsApiClient(
+                    Encryption.decodeString(_wallet_endpoints.baseUrlWalletKYC),
+                    credentials,
+                    httpClient);
+                return await apiClient.GetAllAnnouncements(announcementType, status);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponseModel<List<WalletAnnouncementItem>>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<ApiResponseModel<WalletAnnouncementItem>> LoadAnnouncementByIdLoader(
+            WalletAuthResponseData credentials,
+            HttpClient httpClient,
+            int announcementId)
+        {
+            try
+            {
+                var apiClient = new WalletAccountsApiClient(
+                    Encryption.decodeString(_wallet_endpoints.baseUrlWalletKYC),
+                    credentials,
+                    httpClient);
+                return await apiClient.GetAnnouncementById(announcementId);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponseModel<WalletAnnouncementItem>
                 {
                     IsSuccess = false,
                     StatusCode = 500,
