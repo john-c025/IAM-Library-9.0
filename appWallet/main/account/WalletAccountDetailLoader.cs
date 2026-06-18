@@ -958,6 +958,91 @@ namespace IAM_Library.appWallet.account
             }
         }
 
+        public async Task<ApiResponseModel<List<RaffleListItem>>> LoadRaffleListLoader(
+            WalletAuthResponseData credentials,
+            HttpClient httpClient,
+            bool status)
+        {
+            try
+            {
+                var apiClient = new WalletAccountsApiClient(
+                    Encryption.decodeString(_wallet_endpoints.baseUrlWallet),
+                    credentials,
+                    httpClient);
+                return await apiClient.LoadRaffle(status);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponseModel<List<RaffleListItem>>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<ApiResponseModel<List<MemberRaffleTicket>>> LoadMemberRaffleTicketsLoader(
+            WalletAuthResponseData credentials,
+            HttpClient httpClient,
+            int option,
+            int raffleId,
+            string accountKey = null)
+        {
+            try
+            {
+                var apiClient = new WalletAccountsApiClient(
+                    Encryption.decodeString(_wallet_endpoints.baseUrlWallet),
+                    credentials,
+                    httpClient);
+                return await apiClient.LoadMemberRaffleTickets(
+                    option,
+                    raffleId,
+                    accountKey ?? credentials.accountKey);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponseModel<List<MemberRaffleTicket>>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<ApiResponseModel<RaffleTicketCounter>> LoadRaffleTicketCtrLoader(
+            WalletAuthResponseData credentials,
+            HttpClient httpClient,
+            int option,
+            int raffleId,
+            string accountKey = null)
+        {
+            try
+            {
+                var apiClient = new WalletAccountsApiClient(
+                    Encryption.decodeString(_wallet_endpoints.baseUrlWallet),
+                    credentials,
+                    httpClient);
+                return await apiClient.GetRaffleTicketCtr(
+                    option,
+                    raffleId,
+                    accountKey ?? credentials.accountKey);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponseModel<RaffleTicketCounter>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Description = ex.Message,
+                    Data = null
+                };
+            }
+        }
+
 
     }
 

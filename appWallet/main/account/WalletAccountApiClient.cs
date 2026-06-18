@@ -3175,6 +3175,191 @@ namespace IAM_Library.appWallet.account
             }
         }
 
+        /// <summary>
+        /// GET /util/v1/LoadRaffle?status=
+        /// </summary>
+        public async Task<ApiResponseModel<List<RaffleListItem>>> LoadRaffle(bool status)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("ApiKey", "f24b51dfd6fda3a6fb20882c1554790e");
+
+                var baseUrl = Encryption.decodeString(_wallet_endpoints.baseUrlWalletKYC);
+                var endpoint = Encryption.decodeString(_wallet_endpoints.LoadRaffle);
+                var apiUrl = $"{baseUrl}{endpoint}?status={status.ToString().ToLowerInvariant()}";
+
+                Console.WriteLine($"[DEBUG] Fetching Raffle List: {apiUrl}");
+                var response = await _httpClient.GetAsync(apiUrl);
+                var content = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var list = JsonConvert.DeserializeObject<List<RaffleListItem>>(content);
+                    return new ApiResponseModel<List<RaffleListItem>>
+                    {
+                        IsSuccess = true,
+                        StatusCode = 200,
+                        Description = "Raffle list fetched successfully.",
+                        Data = list
+                    };
+                }
+
+                return new ApiResponseModel<List<RaffleListItem>>
+                {
+                    IsSuccess = false,
+                    StatusCode = (int)response.StatusCode,
+                    Description = content,
+                    Data = null
+                };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"[ERROR] Exception in LoadRaffle: {e.Message}");
+                return new ApiResponseModel<List<RaffleListItem>>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Description = $"Error: {e.Message}",
+                    Data = null
+                };
+            }
+        }
+
+        /// <summary>
+        /// GET /util/v1/LoadMemberRaffleTickets?Option=&amp;RaffleID=&amp;AccountKey=
+        /// </summary>
+        public async Task<ApiResponseModel<List<MemberRaffleTicket>>> LoadMemberRaffleTickets(
+            int option,
+            int raffleId,
+            string accountKey)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(accountKey))
+                {
+                    return new ApiResponseModel<List<MemberRaffleTicket>>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        Description = "accountKey is required.",
+                        Data = null
+                    };
+                }
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue(Encryption.decodeString(_constants.authHeader), _accessToken);
+
+                var baseUrl = Encryption.decodeString(_wallet_endpoints.baseUrlWalletKYC);
+                var endpoint = Encryption.decodeString(_wallet_endpoints.LoadMemberRaffleTickets);
+                var apiUrl =
+                    $"{baseUrl}{endpoint}?Option={option}&RaffleID={raffleId}&AccountKey={Uri.EscapeDataString(accountKey)}";
+
+                Console.WriteLine($"[DEBUG] Fetching Member Raffle Tickets: {apiUrl}");
+                var response = await _httpClient.GetAsync(apiUrl);
+                var content = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var list = JsonConvert.DeserializeObject<List<MemberRaffleTicket>>(content);
+                    return new ApiResponseModel<List<MemberRaffleTicket>>
+                    {
+                        IsSuccess = true,
+                        StatusCode = 200,
+                        Description = "Member raffle tickets fetched successfully.",
+                        Data = list
+                    };
+                }
+
+                return new ApiResponseModel<List<MemberRaffleTicket>>
+                {
+                    IsSuccess = false,
+                    StatusCode = (int)response.StatusCode,
+                    Description = content,
+                    Data = null
+                };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"[ERROR] Exception in LoadMemberRaffleTickets: {e.Message}");
+                return new ApiResponseModel<List<MemberRaffleTicket>>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Description = $"Error: {e.Message}",
+                    Data = null
+                };
+            }
+        }
+
+        /// <summary>
+        /// GET /util/v1/GetRaffleTicketCtr?Option=&amp;RaffleID=&amp;AccountKey=
+        /// </summary>
+        public async Task<ApiResponseModel<RaffleTicketCounter>> GetRaffleTicketCtr(
+            int option,
+            int raffleId,
+            string accountKey)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(accountKey))
+                {
+                    return new ApiResponseModel<RaffleTicketCounter>
+                    {
+                        IsSuccess = false,
+                        StatusCode = 400,
+                        Description = "accountKey is required.",
+                        Data = null
+                    };
+                }
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue(Encryption.decodeString(_constants.authHeader), _accessToken);
+
+                var baseUrl = Encryption.decodeString(_wallet_endpoints.baseUrlWalletKYC);
+                var endpoint = Encryption.decodeString(_wallet_endpoints.GetRaffleTicketCtr);
+                var apiUrl =
+                    $"{baseUrl}{endpoint}?Option={option}&RaffleID={raffleId}&AccountKey={Uri.EscapeDataString(accountKey)}";
+
+                Console.WriteLine($"[DEBUG] Fetching Raffle Ticket Count: {apiUrl}");
+                var response = await _httpClient.GetAsync(apiUrl);
+                var content = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var counter = JsonConvert.DeserializeObject<RaffleTicketCounter>(content);
+                    return new ApiResponseModel<RaffleTicketCounter>
+                    {
+                        IsSuccess = true,
+                        StatusCode = 200,
+                        Description = "Raffle ticket count fetched successfully.",
+                        Data = counter
+                    };
+                }
+
+                return new ApiResponseModel<RaffleTicketCounter>
+                {
+                    IsSuccess = false,
+                    StatusCode = (int)response.StatusCode,
+                    Description = content,
+                    Data = null
+                };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"[ERROR] Exception in GetRaffleTicketCtr: {e.Message}");
+                return new ApiResponseModel<RaffleTicketCounter>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Description = $"Error: {e.Message}",
+                    Data = null
+                };
+            }
+        }
+
         // GET Module Status list
         public async Task<ApiResponseModel<ModuleStatus>> LoadModuleStatusList(int sysId)
         {

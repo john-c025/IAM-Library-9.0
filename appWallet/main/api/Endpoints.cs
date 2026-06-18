@@ -212,6 +212,11 @@ namespace IAM_Library.appWallet.api
 
         public static string GetModuleStatus = "L3YxL1N5c3RlbS9HZXRTeXN0ZW1GdW5jdGlvblN0YXR1cw==";
 
+        // RAFFLE (GET /util/v1/...)
+        public static string LoadRaffle = "L3V0aWwvdjEvTG9hZFJhZmZsZQ==";
+        public static string LoadMemberRaffleTickets = "L3V0aWwvdjEvTG9hZE1lbWJlclJhZmZsZVRpY2tldHM=";
+        public static string GetRaffleTicketCtr = "L3V0aWwvdjEvR2V0UmFmZmxlVGlja2V0Q3Ry";
+
         // ANNOUNCEMENTS (GET only for user-facing apps)
         // NOTE: No base64/encryption required per integration request.
         public static string GetActiveAnnouncements = "/v1/Announcements/GetActiveAnnouncements";
