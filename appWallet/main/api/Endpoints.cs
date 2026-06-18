@@ -46,6 +46,9 @@ namespace IAM_Library.appWallet.api
 
         public static string baseUrlWalletKYC = live_api_util;
         public static string baseUrlWallet = live_wallet;
+
+        public static string live_general = "aHR0cHM6Ly9hcGl2Mi5pYW0td29ybGR3aWRlY29ycC5jb20=";
+        public static string beta_general = "aHR0cHM6Ly9iZXRhYXBpdjIuaWFtLXdvcmxkd2lkZWNvcnAuY29t";
         
         
         public static string walletAuthtenticate = IAM_Maintenance.Decrypt("WsycQEl703GLHZxOKXXKz+ki6bocLT/7eCUAaWYdOtc=", _key, _iv);
@@ -218,7 +221,7 @@ namespace IAM_Library.appWallet.api
         public static string GetRaffleTicketCtr = "L3V0aWwvdjEvR2V0UmFmZmxlVGlja2V0Q3Ry";
 
         // ANNOUNCEMENTS (GET only for user-facing apps)
-        // NOTE: No base64/encryption required per integration request.
+        
         public static string GetActiveAnnouncements = "/v1/Announcements/GetActiveAnnouncements";
         public static string GetAllAnnouncements = "/v1/Announcements/GetAllAnnouncements";
         public static string GetAnnouncementById = "/v1/Announcements/GetAnnouncementById/";

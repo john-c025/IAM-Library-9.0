@@ -3175,6 +3175,9 @@ namespace IAM_Library.appWallet.account
             }
         }
 
+
+
+
         /// <summary>
         /// GET /util/v1/LoadRaffle?status=
         /// </summary>
@@ -3185,7 +3188,7 @@ namespace IAM_Library.appWallet.account
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("ApiKey", "f24b51dfd6fda3a6fb20882c1554790e");
 
-                var baseUrl = Encryption.decodeString(_wallet_endpoints.baseUrlWalletKYC);
+                var baseUrl = Encryption.decodeString(_wallet_endpoints.live_general);
                 var endpoint = Encryption.decodeString(_wallet_endpoints.LoadRaffle);
                 var apiUrl = $"{baseUrl}{endpoint}?status={status.ToString().ToLowerInvariant()}";
 
@@ -3251,7 +3254,7 @@ namespace IAM_Library.appWallet.account
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue(Encryption.decodeString(_constants.authHeader), _accessToken);
 
-                var baseUrl = Encryption.decodeString(_wallet_endpoints.baseUrlWalletKYC);
+                var baseUrl = Encryption.decodeString(_wallet_endpoints.live_general);
                 var endpoint = Encryption.decodeString(_wallet_endpoints.LoadMemberRaffleTickets);
                 var apiUrl =
                     $"{baseUrl}{endpoint}?Option={option}&RaffleID={raffleId}&AccountKey={Uri.EscapeDataString(accountKey)}";
@@ -3318,7 +3321,7 @@ namespace IAM_Library.appWallet.account
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue(Encryption.decodeString(_constants.authHeader), _accessToken);
 
-                var baseUrl = Encryption.decodeString(_wallet_endpoints.baseUrlWalletKYC);
+                var baseUrl = Encryption.decodeString(_wallet_endpoints.live_general);
                 var endpoint = Encryption.decodeString(_wallet_endpoints.GetRaffleTicketCtr);
                 var apiUrl =
                     $"{baseUrl}{endpoint}?Option={option}&RaffleID={raffleId}&AccountKey={Uri.EscapeDataString(accountKey)}";
